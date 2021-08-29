@@ -82,6 +82,7 @@ namespace ReactiveMarbles.NuGet.Helpers
             _nugetFrameworks["net472"] = new[] { new NuGetFramework(".NETFramework", new Version(4, 7, 2, 0)) };
             _nugetFrameworks["net48"] = new[] { new NuGetFramework(".NETFramework", new Version(4, 8, 0, 0)) };
             _nugetFrameworks["net5.0"] = new[] { FrameworkConstants.CommonFrameworks.Net50 };
+            _nugetFrameworks["net6.0"] = new[] { new NuGetFramework(".NETCoreApp", new Version(6, 0, 0, 0)), FrameworkConstants.CommonFrameworks.NetStandard20 };
 
             _nugetFrameworks["uap10.0"] = new[] { FrameworkConstants.CommonFrameworks.UAP10, FrameworkConstants.CommonFrameworks.NetStandard20 };
             _nugetFrameworks["uap"] = new[] { FrameworkConstants.CommonFrameworks.UAP10, FrameworkConstants.CommonFrameworks.NetStandard20 };
