@@ -77,12 +77,13 @@ namespace ReactiveMarbles.NuGet.Helpers
             _nugetFrameworks["net46"] = new[] { FrameworkConstants.CommonFrameworks.Net46 };
             _nugetFrameworks["net461"] = new[] { FrameworkConstants.CommonFrameworks.Net461 };
             _nugetFrameworks["net462"] = new[] { FrameworkConstants.CommonFrameworks.Net462 };
-            _nugetFrameworks["net47"] = new[] { new NuGetFramework(".NETFramework", new Version(4, 7, 0, 0)) };
-            _nugetFrameworks["net471"] = new[] { new NuGetFramework(".NETFramework", new Version(4, 7, 1, 0)) };
-            _nugetFrameworks["net472"] = new[] { new NuGetFramework(".NETFramework", new Version(4, 7, 2, 0)) };
+            _nugetFrameworks["net47"] = new[] { FrameworkConstants.CommonFrameworks.Net47 };
+            _nugetFrameworks["net471"] = new[] { FrameworkConstants.CommonFrameworks.Net471 };
+            _nugetFrameworks["net472"] = new[] { FrameworkConstants.CommonFrameworks.Net472 };
             _nugetFrameworks["net48"] = new[] { new NuGetFramework(".NETFramework", new Version(4, 8, 0, 0)) };
             _nugetFrameworks["net5.0"] = new[] { FrameworkConstants.CommonFrameworks.Net50 };
-            _nugetFrameworks["net6.0"] = new[] { new NuGetFramework(".NETCoreApp", new Version(6, 0, 0, 0)), FrameworkConstants.CommonFrameworks.NetStandard20 };
+            _nugetFrameworks["net6.0"] = new[] { FrameworkConstants.CommonFrameworks.Net60 };
+            _nugetFrameworks["net7.0"] = new[] { new NuGetFramework(".NETCoreApp", new Version(7, 0, 0, 0)) };
 
             _nugetFrameworks["uap10.0"] = new[] { FrameworkConstants.CommonFrameworks.UAP10, FrameworkConstants.CommonFrameworks.NetStandard20 };
             _nugetFrameworks["uap"] = new[] { FrameworkConstants.CommonFrameworks.UAP10, FrameworkConstants.CommonFrameworks.NetStandard20 };
