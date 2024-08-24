@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019-2023 ReactiveUI Association Incorporated. All rights reserved.
+﻿// Copyright (c) 2019-2024 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -22,7 +22,7 @@ public class FilesGroup
     /// <returns>The full path if available, null otherwise.</returns>
     public string? GetFullFilePath(string fileName)
     {
-        var processing = new Queue<DirectoryNode>(new[] { _rootNode });
+        var processing = new Queue<DirectoryNode>([_rootNode]);
 
         while (processing.Count != 0)
         {
@@ -48,7 +48,7 @@ public class FilesGroup
     /// <returns>The files.</returns>
     public IEnumerable<string> GetAllFileNames()
     {
-        var processing = new Queue<DirectoryNode>(new[] { _rootNode });
+        var processing = new Queue<DirectoryNode>([_rootNode]);
 
         while (processing.Count != 0)
         {
@@ -80,7 +80,7 @@ public class FilesGroup
         {
             var directoryPath = Path.GetDirectoryName(file);
 
-            var splitDirectory = directoryPath?.Split(new[] { Path.PathSeparator, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+            var splitDirectory = directoryPath?.Split(new[] { Path.PathSeparator, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries) ?? [];
 
             var directoryNode = _rootNode;
 
@@ -93,35 +93,24 @@ public class FilesGroup
         }
     }
 
-    private class DirectoryNode : IEqualityComparer<DirectoryNode>, IComparable<DirectoryNode>
+    private class DirectoryNode(FilesGroup.DirectoryNode? parent, string name) : IEqualityComparer<DirectoryNode>, IComparable<DirectoryNode>
     {
-        private readonly Dictionary<string, DirectoryNode> _childNodesDict = new();
-        private readonly List<DirectoryNode> _childNodes = new();
-        private readonly List<FileNode> _files = new();
-        private readonly Dictionary<string, FileNode> _filesDict = new();
-
-        public DirectoryNode(DirectoryNode? parent, string name)
-        {
-            Name = name;
-            Parent = parent;
-        }
+        private readonly Dictionary<string, DirectoryNode> _childNodesDict = [];
+        private readonly List<DirectoryNode> _childNodes = [];
+        private readonly List<FileNode> _files = [];
+        private readonly Dictionary<string, FileNode> _filesDict = [];
 
         public DirectoryNode(string name)
             : this(null, name)
         {
         }
 
-        public string Name { get; }
+        public string Name { get; } = name;
 
-        public string FullPath
-        {
-            get
-            {
-                return Parent == null || string.IsNullOrWhiteSpace(Parent.FullPath) ? Name : Parent.FullPath + Path.DirectorySeparatorChar + Name;
-            }
-        }
+        public string FullPath =>
+            Parent == null || string.IsNullOrWhiteSpace(Parent.FullPath) ? Name : Parent.FullPath + Path.DirectorySeparatorChar + Name;
 
-        public DirectoryNode? Parent { get; }
+        public DirectoryNode? Parent { get; } = parent;
 
         public IEnumerable<FileNode> Files => _files;
 
@@ -189,17 +178,11 @@ public class FilesGroup
         }
     }
 
-    private class FileNode : IEqualityComparer<FileNode>, IComparable<FileNode>
+    private class FileNode(string fileName, string fullPath) : IEqualityComparer<FileNode>, IComparable<FileNode>
     {
-        public FileNode(string fileName, string fullPath)
-        {
-            FullPath = fullPath;
-            FileName = fileName;
-        }
+        public string FullPath { get; } = fullPath;
 
-        public string FullPath { get; }
-
-        public string FileName { get; }
+        public string FileName { get; } = fileName;
 
         /// <inheritdoc />
         public bool Equals(FileNode x, FileNode y) => StringComparer.InvariantCultureIgnoreCase.Equals(x?.FullPath, y?.FullPath);
