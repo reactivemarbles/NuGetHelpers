@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019-2023 ReactiveUI Association Incorporated. All rights reserved.
+﻿// Copyright (c) 2019-2024 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -31,7 +31,7 @@ public static class NuGetFrameworkFolderHelper
             "xamarin.tvos" => HandleTVOS(),
             "xamarin.watchos" => HandleWatchOS(),
             "xamarin.mac" => HandleMac(),
-            _ => Array.Empty<string>(),
+            _ => [],
         };
 
         return FileSystemHelpers.GetSubdirectoriesWithMatch(folders, AssemblyHelpers.AssemblyFileExtensionsSet);
@@ -41,28 +41,28 @@ public static class NuGetFrameworkFolderHelper
     {
         var referenceAssembliesLocation = GetReferenceLocation("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/");
 
-        return new[] { Path.Combine(referenceAssembliesLocation, "Xamarin.WatchOS") };
+        return [Path.Combine(referenceAssembliesLocation, "Xamarin.WatchOS")];
     }
 
     private static IEnumerable<string> HandleTVOS()
     {
         var referenceAssembliesLocation = GetReferenceLocation("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/");
 
-        return new[] { Path.Combine(referenceAssembliesLocation, "Xamarin.TVOS") };
+        return [Path.Combine(referenceAssembliesLocation, "Xamarin.TVOS")];
     }
 
     private static IEnumerable<string> HandleiOS()
     {
         var referenceAssembliesLocation = GetReferenceLocation("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/");
 
-        return new[] { Path.Combine(referenceAssembliesLocation, "Xamarin.iOS") };
+        return [Path.Combine(referenceAssembliesLocation, "Xamarin.iOS")];
     }
 
     private static IEnumerable<string> HandleMac()
     {
         var referenceAssembliesLocation = GetReferenceLocation("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/");
 
-        return new[] { Path.Combine(referenceAssembliesLocation, "Xamarin.Mac") };
+        return [Path.Combine(referenceAssembliesLocation, "Xamarin.Mac")];
     }
 
     private static IEnumerable<string> HandleAndroid(NuGetFramework nugetFramework)
@@ -71,25 +71,22 @@ public static class NuGetFrameworkFolderHelper
 
         var versionText = $"v{nugetFramework.Version.Major}.{nugetFramework.Version.Minor}";
 
-        return new[] { Path.Combine(referenceAssembliesLocation, "MonoAndroid", versionText), Path.Combine(referenceAssembliesLocation, "MonoAndroid", "v1.0") };
+        return [Path.Combine(referenceAssembliesLocation, "MonoAndroid", versionText), Path.Combine(referenceAssembliesLocation, "MonoAndroid", "v1.0")];
     }
 
     private static string GetReferenceLocation(string macLocation)
     {
-        string referenceAssembliesLocation;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            referenceAssembliesLocation = macLocation;
+            return macLocation;
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            referenceAssembliesLocation = ReferenceLocator.GetReferenceLocation();
+            return ReferenceLocator.GetReferenceLocation();
         }
         else
         {
             throw new NotSupportedException("Cannot process on Linux");
         }
-
-        return referenceAssembliesLocation;
     }
 }

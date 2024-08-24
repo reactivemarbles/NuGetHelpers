@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019-2023 ReactiveUI Association Incorporated. All rights reserved.
+﻿// Copyright (c) 2019-2024 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -16,15 +16,15 @@ namespace ReactiveMarbles.NuGet.Helpers;
 /// </summary>
 public static class AssemblyHelpers
 {
-    private static readonly string[] AssemblyFileExtensions =
-    {
+    private static readonly string[] _assemblyFileExtensions =
+    [
         ".winmd", ".dll", ".exe"
-    };
+    ];
 
     /// <summary>
     /// Gets the assembly file extensions set.
     /// </summary>
-    public static ISet<string> AssemblyFileExtensionsSet { get; } = new HashSet<string>(AssemblyFileExtensions, StringComparer.InvariantCultureIgnoreCase);
+    public static ISet<string> AssemblyFileExtensionsSet { get; } = new HashSet<string>(_assemblyFileExtensions, StringComparer.InvariantCultureIgnoreCase);
 
     /// <summary>
     /// Finds the union metadata file.
