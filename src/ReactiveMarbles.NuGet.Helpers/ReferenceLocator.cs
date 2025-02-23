@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019-2023 ReactiveUI Association Incorporated. All rights reserved.
+﻿// Copyright (c) 2019-2024 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -23,7 +23,7 @@ namespace ReactiveMarbles.NuGet.Helpers;
 /// </summary>
 public static class ReferenceLocator
 {
-    private static readonly PackageIdentity VSWherePackageIdentity = new("VSWhere", new NuGetVersion("2.6.7"));
+    private static readonly PackageIdentity _vSWherePackageIdentity = new("VSWhere", new NuGetVersion("2.6.7"));
 
     private static readonly ConcurrentDictionary<bool, string> _windowsInstallationDirectory = new();
 
@@ -59,10 +59,10 @@ public static class ReferenceLocator
                     async () =>
                     {
                         var results = await NuGetPackageHelper.DownloadPackageFilesAndFolder(
-                                          new[] { VSWherePackageIdentity },
-                                          new[] { new NuGetFramework("Any") },
-                                          packageFolders: new[] { PackagingConstants.Folders.Tools },
-                                          getDependencies: false).ConfigureAwait(false);
+                                          new[] { _vSWherePackageIdentity },
+                                          [new NuGetFramework("Any")],
+                                          getDependencies: false,
+                                          packageFolders: [PackagingConstants.Folders.Tools]).ConfigureAwait(false);
 
                         var fileName = results.IncludeGroup.GetAllFileNames().FirstOrDefault(x => x.EndsWith("vswhere.exe", StringComparison.InvariantCultureIgnoreCase));
 

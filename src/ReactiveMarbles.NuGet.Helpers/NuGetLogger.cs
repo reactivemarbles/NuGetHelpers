@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023 ReactiveUI Association Incorporated. All rights reserved.
+// Copyright (c) 2019-2024 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -13,14 +13,9 @@ namespace ReactiveMarbles.NuGet.Helpers;
 /// <summary>
 /// A logger provider for the NuGet clients API.
 /// </summary>
-internal class NuGetLogger : ILogger
+internal class NuGetLogger(INuGetLoggerOutput? logger = null) : ILogger
 {
-    private INuGetLoggerOutput _logger;
-
-    public NuGetLogger(INuGetLoggerOutput? logger = null)
-    {
-        _logger = logger ?? new ConsoleNuGetLoggerOutput();
-    }
+    private readonly INuGetLoggerOutput _logger = logger ?? new ConsoleNuGetLoggerOutput();
 
     /// <inheritdoc />
     public void Log(LogLevel level, string data)

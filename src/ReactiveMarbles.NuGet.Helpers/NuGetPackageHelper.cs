@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023 ReactiveUI Association Incorporated. All rights reserved.
+// Copyright (c) 2019-2024 ReactiveUI Association Incorporated. All rights reserved.
 // ReactiveUI Association Incorporated licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
@@ -31,9 +31,9 @@ public static class NuGetPackageHelper
     /// </summary>
     public const string DefaultNuGetSource = "https://api.nuget.org/v3/index.json";
 
-    private static readonly int ProcessingCount = Environment.ProcessorCount;
+    private static readonly int _processingCount = Environment.ProcessorCount;
 
-    private static readonly string[] DefaultFoldersToGrab = { PackagingConstants.Folders.Lib, PackagingConstants.Folders.Build, PackagingConstants.Folders.Ref };
+    private static readonly string[] _defaultFoldersToGrab = [PackagingConstants.Folders.Lib, PackagingConstants.Folders.Build, PackagingConstants.Folders.Ref];
 
     // Bunch of NuGet based objects we can cache and only create once.
     private static readonly string _globalPackagesPath;
@@ -44,8 +44,7 @@ public static class NuGetPackageHelper
 
     static NuGetPackageHelper()
     {
-        Providers = new List<Lazy<INuGetResourceProvider>>();
-        Providers.AddRange(Repository.Provider.GetCoreV3());
+        Providers = [.. Repository.Provider.GetCoreV3()];
 
         _globalPackagesPath = SettingsUtility.GetGlobalPackagesFolder(new XPlatMachineWideSetting().Settings);
     }
@@ -97,7 +96,7 @@ public static class NuGetPackageHelper
         CancellationToken token = default)
     {
         // If the user hasn't selected a default framework to extract, select .NET Standard 2.0
-        frameworks ??= new[] { FrameworkConstants.CommonFrameworks.NetStandard20 };
+        frameworks ??= [FrameworkConstants.CommonFrameworks.NetStandard20];
 
         // Use the provided nuget package source, or use nuget.org
         var sourceRepository = new SourceRepository(nugetSource ?? new PackageSource(DefaultNuGetSource), Providers);
@@ -131,7 +130,7 @@ public static class NuGetPackageHelper
         CancellationToken token = default)
     {
         // If the user hasn't selected a default framework to extract, select .NET Standard 2.0
-        frameworks ??= new[] { FrameworkConstants.CommonFrameworks.NetStandard20 };
+        frameworks ??= [FrameworkConstants.CommonFrameworks.NetStandard20];
 
         // Use the provided nuget package source, or use nuget.org
         var sourceRepository = new SourceRepository(nugetSource ?? new PackageSource(DefaultNuGetSource), Providers);
@@ -214,7 +213,7 @@ public static class NuGetPackageHelper
         var librariesToCopy = await GetPackagesToCopy(packageIdentities, downloadResource, frameworks, getDependencies, token).ConfigureAwait(false);
 
         packageOutputDirectory ??= GetRandomPackageDirectory();
-        packageFolders ??= DefaultFoldersToGrab;
+        packageFolders ??= _defaultFoldersToGrab;
 
         return CopyPackageFiles(librariesToCopy, frameworks, packageFolders, packageOutputDirectory, token);
     }
@@ -244,7 +243,7 @@ public static class NuGetPackageHelper
             }
         }
 
-        var processingItems = new (PackageIdentity PackageIdentity, bool IncludeFiles)[ProcessingCount];
+        var processingItems = new (PackageIdentity PackageIdentity, bool IncludeFiles)[_processingCount];
         while (stack.Count != 0)
         {
             var count = stack.TryPopRange(processingItems);
@@ -256,7 +255,7 @@ public static class NuGetPackageHelper
             var results = await Task.WhenAll(
                      currentItems.Select(
                          async item =>
-                             (DownloadResourceResult: await downloadResource.GetDownloadResourceResultAsync(item.PackageIdentity, _downloadContext, _globalPackagesPath, _logger, token).ConfigureAwait(false), PackageIdentity: item.PackageIdentity, IncludeFilesInOutput: item.IncludeFiles))).ConfigureAwait(false);
+                             (DownloadResourceResult: await downloadResource.GetDownloadResourceResultAsync(item.PackageIdentity, _downloadContext, _globalPackagesPath, _logger, token).ConfigureAwait(false), item.PackageIdentity, IncludeFilesInOutput: item.IncludeFiles))).ConfigureAwait(false);
 
             foreach (var item in results.Where(x => x.DownloadResourceResult.Status == DownloadResourceResultStatus.Available || x.DownloadResourceResult.Status == DownloadResourceResultStatus.AvailableWithoutStream))
             {
@@ -267,7 +266,7 @@ public static class NuGetPackageHelper
             }
         }
 
-        return packagesToCopy.Values.ToList();
+        return [.. packagesToCopy.Values];
     }
 
     private static InputAssembliesGroup CopyPackageFiles(
@@ -280,7 +279,7 @@ public static class NuGetPackageHelper
         // Default back to a any framework.
         if (!frameworks.Contains(NuGetFramework.AnyFramework))
         {
-            frameworks = frameworks.Concat(new[] { NuGetFramework.AnyFramework }).ToList();
+            frameworks = [.. frameworks, .. new[] { NuGetFramework.AnyFramework }];
         }
 
         var inputAssembliesGroup = new InputAssembliesGroup();
@@ -303,15 +302,15 @@ public static class NuGetPackageHelper
                              _logger,
                              token)));
 
-            foreach (var folder in folders)
+            foreach (var (folder, files) in folders)
             {
                 if (includeFilesInOutput)
                 {
-                    inputAssembliesGroup.IncludeGroup.AddFiles(folder.files);
+                    inputAssembliesGroup.IncludeGroup.AddFiles(files);
                 }
                 else
                 {
-                    inputAssembliesGroup.SupportGroup.AddFiles(folder.files);
+                    inputAssembliesGroup.SupportGroup.AddFiles(files);
                 }
             }
         }
@@ -345,13 +344,13 @@ public static class NuGetPackageHelper
 
         // If no packages match our framework just return an empty array.
         return highestFramework == null
-            ? Array.Empty<PackageIdentity>()
+            ? []
             : highestFramework.Packages.Select(package => new PackageIdentity(package.Id, package.VersionRange.MinVersion));
     }
 
     private static IEnumerable<(string Folder, IEnumerable<string> Files)> GetFileGroups(this PackageReaderBase reader, IReadOnlyCollection<string> folders, IReadOnlyCollection<NuGetFramework> frameworksToInclude)
     {
-        var groups = new Dictionary<NuGetFramework, Dictionary<string, List<string>>>(new NuGetFrameworkFullComparer());
+        var groups = new Dictionary<NuGetFramework, Dictionary<string, List<string>>>(NuGetFrameworkFullComparer.Instance);
         foreach (var folder in folders)
         {
             foreach (var file in reader.GetFiles(folder))
@@ -367,13 +366,13 @@ public static class NuGetPackageHelper
 
                 if (!groups.TryGetValue(frameworkFromPath, out var folderDictionary))
                 {
-                    folderDictionary = new Dictionary<string, List<string>>();
+                    folderDictionary = [];
                     groups.Add(frameworkFromPath, folderDictionary);
                 }
 
                 if (!folderDictionary.TryGetValue(folder, out var stringList))
                 {
-                    stringList = new List<string>();
+                    stringList = [];
                     folderDictionary.Add(folder, stringList);
                 }
 
@@ -423,7 +422,7 @@ public static class NuGetPackageHelper
         }
     }
 
-    private static NuGetFramework GetFrameworkFromPath(this IPackageCoreReader reader, string path, bool allowSubFolders = false)
+    private static NuGetFramework GetFrameworkFromPath(this PackageReaderBase reader, string path, bool allowSubFolders = false)
     {
         var nuGetFramework = NuGetFramework.AnyFramework;
         var strArray = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
